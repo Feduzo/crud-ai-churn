@@ -38,8 +38,8 @@ Requirements: Python 3.10+ and [Ollama](https://ollama.com).
 ollama run mistral
 
 # terminal 2: run the project
-git clone https://github.com/Feduzo/proj-padrao-e-arquitetura-de-software.git
-cd proj-padrao-e-arquitetura-de-software
+git clone https://github.com/Feduzo/crud-ai-churn.git
+cd crud-ai-churn
 pip install requests
 python crud_ia_ollama_final.py
 ```
