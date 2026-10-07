@@ -3,7 +3,6 @@ CRUD + IA Real com Ollama
 Sistema de Previsão de Churn usando Modelo de Linguagem Local
 
 Autor: Felipe de Sousa Duzo
-RA: 202320905
 Data: Maio 2026
 
 Requisitos:
@@ -77,7 +76,7 @@ class ChurnIA:
             r = requests.post(self.url, json={"model": self.model, "prompt": "test"}, timeout=2)
             if r.status_code != 200:
                 raise ConnectionError("Não foi possível conectar no Ollama")
-        except:
+        except (requests.RequestException, ConnectionError):
             print("\n erro Ollama está off")
             print("rode ollama com 'run mistral' e tente denovo")
             exit(1)
@@ -130,7 +129,6 @@ Regras: se score < 30 => probabilidade 0.90, risco "ALTO";
             
         except requests.exceptions.Timeout:
             raise Exception("ollama demorou muito")
-            raise Exception("ollama Timeout")
         except Exception as e:
             raise Exception(f"Ollama erro call: {str(e)}")
 
@@ -241,7 +239,7 @@ if __name__ == "__main__":
         test_integracao()
         
         print("\n" + "=" * 60)
-        print("Amem, todos os testes passaram")
+        print("Todos os testes passaram")
         print("=" * 60)
         
     except Exception as e:
