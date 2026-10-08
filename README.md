@@ -1,57 +1,57 @@
-# CRUD + AI: Churn Prediction with a Local LLM
+# CRUD + IA: previsão de churn com uma LLM local
 
-A customer management system (CRUD) that uses a local language model to estimate each customer's churn risk, meaning how likely they are to stop using a service. Academic project for the Software Patterns and Architecture course of the Software Engineering program at USF.
+Um sistema de cadastro de clientes (CRUD) que usa um modelo de linguagem local para estimar o risco de churn de cada cliente, ou seja, a chance de ele deixar de usar um serviço. Projeto acadêmico da disciplina de Padrões e Arquitetura de Software do curso de Engenharia de Software da USF.
 
-The goal was to practice clean separation of responsibilities and to integrate an LLM into a traditional system, running it locally with no API key or cost.
+O objetivo era praticar separação de responsabilidades e integrar uma LLM a um sistema tradicional, rodando tudo localmente, sem chave de API e sem custo.
 
-## How it works
+## Como funciona
 
 ```text
-SistemaCRUDIA (entry point)
-   ├──► RepositorioCliente   create, read, update, delete and list customers
-   └──► ChurnIA              sends the customer's activity score to the LLM
-                               └──► Ollama (mistral) at localhost:11434
+SistemaCRUDIA (ponto de entrada)
+   ├──► RepositorioCliente   cria, lê, atualiza, remove e lista clientes
+   └──► ChurnIA              envia o score de atividade do cliente para a LLM
+                               └──► Ollama (mistral) em localhost:11434
 ```
 
-1. A customer is registered with an activity score from 0 to 100.
-2. `ChurnIA` builds a prompt and asks the model for a JSON answer with the churn probability and risk level (HIGH, MEDIUM or LOW).
-3. The answer is parsed and validated, and the result is saved back to the customer through the repository, along with the response time.
+1. O cliente é cadastrado com um score de atividade de 0 a 100.
+2. A `ChurnIA` monta um prompt e pede ao modelo uma resposta em JSON com a probabilidade de churn e o nível de risco (ALTO, MÉDIO ou BAIXO).
+3. A resposta é interpretada e validada, e o resultado volta para o cliente pelo repositório, junto com o tempo de resposta.
 
-## Design decisions
+## Decisões de projeto
 
-- **Repository pattern:** `RepositorioCliente` hides how customers are stored. Today it is an in-memory dictionary; it could become a database without changing the rest of the code.
-- **AI as a separate service:** `ChurnIA` holds everything related to the model (URL, model name, prompt, parsing), so the provider can be swapped in one place.
-- **Single entry point:** `SistemaCRUDIA` combines both and exposes simple operations, keeping the business flow in one class.
-- **Defensive parsing:** LLMs do not always return clean JSON, so the code extracts the JSON block from the answer and fails with a clear message when it is invalid.
-- **Startup check:** the app verifies that Ollama is running before starting and explains how to fix it if not.
+- **Padrão Repository:** o `RepositorioCliente` esconde como os clientes são guardados. Hoje é um dicionário em memória; poderia virar um banco sem mudar o resto do código.
+- **IA como serviço separado:** a `ChurnIA` concentra tudo que é do modelo (URL, nome do modelo, prompt, interpretação), então dá para trocar de provedor em um lugar só.
+- **Ponto de entrada único:** o `SistemaCRUDIA` junta os dois e expõe operações simples, mantendo o fluxo de negócio numa classe só.
+- **Leitura defensiva:** LLMs nem sempre devolvem um JSON limpo, então o código extrai o bloco de JSON da resposta e falha com uma mensagem clara quando ele é inválido.
+- **Checagem na inicialização:** o sistema verifica se o Ollama está rodando antes de começar e explica como resolver se não estiver.
 
-## Tech stack
+## Stack
 
-Python, Requests, Ollama (`mistral` model).
+Python, Requests, Ollama (modelo `mistral`).
 
-## Running it
+## Como rodar
 
-Requirements: Python 3.10+ and [Ollama](https://ollama.com).
+Requisitos: Python 3.10+ e [Ollama](https://ollama.com).
 
 ```bash
-# terminal 1: start the model
+# terminal 1: sobe o modelo
 ollama run mistral
 
-# terminal 2: run the project
+# terminal 2: roda o projeto
 git clone https://github.com/Feduzo/crud-ai-churn.git
 cd crud-ai-churn
 pip install requests
 python crud_ia_ollama_final.py
 ```
 
-Running the file executes three tests: the CRUD on its own, the AI on its own and the full integration.
+Rodar o arquivo executa três testes: o CRUD sozinho, a IA sozinha e a integração completa.
 
-## Limitations and next steps
+## Limitações e próximos passos
 
-In this version the prompt gives the model fixed thresholds (score below 30 is high risk, and so on). That kept the results predictable for the assignment, but simple rules like these would be faster and cheaper as plain code. The natural next step is to let the model do what rules cannot, for example analyzing free-text customer feedback or support tickets to explain why a customer might leave.
+Nesta versão, o prompt passa ao modelo regras fixas (score abaixo de 30 é risco alto, e assim por diante). Isso deixou os resultados previsíveis para o trabalho, mas regras simples assim seriam mais rápidas e baratas como código comum. O próximo passo natural é usar o modelo no que regra nenhuma resolve, por exemplo analisar feedbacks e chamados de suporte em texto livre para explicar por que um cliente pode ir embora.
 
-Other improvements: persist customers in SQLite and move the tests to pytest.
+Outras melhorias: guardar os clientes em SQLite e passar os testes para o pytest.
 
-## License
+## Licença
 
 [MIT](LICENSE)
